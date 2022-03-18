@@ -2,13 +2,17 @@ const fs = require("fs");
 const drivelist = require('drivelist');
 const {spawn, execSync} = require("child_process");
 
-let currentMount = null;
+const nodeDir =
+
+    let
+currentMount = null;
 
 let frontendProcess = null;
 let backendProcess = null;
 
-if (!fs.existsSync("./usb"))
+if (!fs.existsSync("./usb")) {
     fs.mkdirSync("./usb");
+}
 
 console.log("Start monitoring...");
 
@@ -27,10 +31,12 @@ async function pollUSB() {
 async function onAttach(drive) {
     console.log("Connected... starting DAQ!");
 
-    execSync(`mount ${drive.device}1 ./usb`);
+    execSync(`mount -o umask=0 ${drive.device}1 ./usb`);
+    execSync(`export NODE_VERSION=17.7.1`);
+
     currentMount = drive.device;
-    frontendProcess = execSync("(cd ./usb/bajafrontendv1; sudo -u pi npm dev > backend.log)");
-    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm dev  > frontend.log)");
+    frontendProcess = execSync("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)");
+    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)");
 
     console.log("Started DAQ!");
 }
