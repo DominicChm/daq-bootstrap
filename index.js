@@ -26,18 +26,24 @@ async function pollUSB() {
 }
 
 async function onAttach(drive) {
-    console.log("Connected... starting DAQ!");
+    console.log("USB Connected...");
 
     if(driveType(`${drive.device}1`) !== "ntfs")
         throw new Error("ERROR - THIS DRIVE IS NOT NTFS FORMATTED!");
 
     execSync(`mount -o umask=0 ${drive.device}1 ./usb`);
 
-    if (!fs.existsSync("./usb/bajacorev1"))
-        execSync("(cd ./usb; git clone https://github.com/DominicChm/bajacorev1.git)");
+    if (!fs.existsSync("./usb/bajacorev1")) {
+        console.log("No backend repo detected, cloning and installing...");
+        execSync("(cd ./usb; git clone https://github.com/DominicChm/bajacorev1.git)", {stdio: 'inherit'});
+        execSync("(cd ./usb/bajacorev1; npm i)", {stdio: 'inherit'})
+    }
 
-    if (!fs.existsSync("./usb/bajafrontendv1"))
-        execSync("(cd ./usb; git clone https://github.com/DominicChm/bajafrontendv1.git)");
+    if (!fs.existsSync("./usb/bajafrontendv1")) {
+        console.log("No frontend repo detected, cloning and installing...");
+        execSync("(cd ./usb; git clone https://github.com/DominicChm/bajafrontendv1.git)", {stdio: 'inherit'});
+        execSync("(cd ./usb/bajafrontendv1; npm i)", {stdio: 'inherit'})
+    }
 
     // Try to update the code, if we have a network connection.
     try {
@@ -49,7 +55,7 @@ async function onAttach(drive) {
 
     console.log("Starting DAQ...")
     currentMount = drive.device;
-    frontendProcess = execSync("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)");
+    frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)");
     backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)");
 
     console.log("Started DAQ!");
