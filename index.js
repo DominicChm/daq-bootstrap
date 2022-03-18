@@ -59,15 +59,15 @@ async function onAttach(drive) {
 
     frontendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'pipe'});
     frontendProcess.stdout.on("data", (data) => {
-        console.log(`frontend: ${data}`);
+        console.log(`frontend: ${data.trim()}`);
     });
     frontendProcess.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
     });
 
-    backendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'pipe'});
+    backendProcess = spawn("bash", ["run-backend.sh"], {stdio: 'pipe'});
     backendProcess.stdout.on("data", (data) => {
-        console.log(`backend: ${data}`);
+        console.log(`backend: ${data.trim()}`);
     });
     backendProcess.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
