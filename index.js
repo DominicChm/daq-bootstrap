@@ -57,14 +57,20 @@ async function onAttach(drive) {
 
     console.log("Starting DAQ...")
 
-    frontendProcess = spawn("bash", ["run-frontend.sh"]);
+    frontendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'inherit'});
     frontendProcess.stdout.on("data", (data) => {
         console.log(`frontend: ${data}`);
     });
+    frontendProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
 
-    backendProcess = spawn("bash", ["run-frontend.sh"]);
+    backendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'inherit'});
     backendProcess.stdout.on("data", (data) => {
         console.log(`backend: ${data}`);
+    });
+    backendProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
     });
 
     console.log("Started DAQ!");
