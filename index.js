@@ -1,6 +1,6 @@
 const fs = require("fs");
 const drivelist = require('drivelist');
-const {spawn} = require("child_process");
+const {spawn, execSync} = require("child_process");
 
 let currentMount = null;
 
@@ -10,9 +10,12 @@ let backendProcess = null;
 if (!fs.existsSync("./usb"))
     fs.mkdirSync("./usb");
 
+console.log("Start monitoring...");
+
 async function pollUSB() {
     //Filter USB drives
     const drives = (await drivelist.list()).filter(d => d.isUSB);
+
     if (currentMount) {
         if (!drives.find(d => d.device === currentMount)) await onDetach();
     } else {
@@ -22,34 +25,27 @@ async function pollUSB() {
 }
 
 async function onAttach(drive) {
-    await execShell(`mount ${drive.device} ./usb`);
+    console.log("Connected... starting DAQ!");
+
+    execSync(`mount ${drive.device}1 ./usb`);
     currentMount = drive.device;
-    frontendProcess = spawn("(cd ./usb/bajafrontendv1; npm dev > backend.log)");
-    backendProcess = spawn("(cd ./usb/bajacorev1; npm dev  > frontend.log)");
+    frontendProcess = execSync("(cd ./usb/bajafrontendv1; sudo -u pi npm dev > backend.log)");
+    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm dev  > frontend.log)");
 
     console.log("Started DAQ!");
 }
 
 async function onDetach() {
+    console.log("Detached... killing DAQ!");
+
     frontendProcess.kill();
     backendProcess.kill();
-    await execShell(`umount -l ./usb`);
+    execSync(`umount -l ./usb`);
     currentMount = null;
+    frontendProcess = null;
+    backendProcess = null;
 
     console.log("Killed DAQ!");
 }
 
 setInterval(pollUSB, 1000);
-
-
-function execShell(cmd) {
-    const exec = require('child_process').exec;
-    return new Promise((resolve, reject) => {
-        exec(cmd, (error, stdout, stderr) => {
-            if (error) {
-                console.warn(error);
-            }
-            resolve(stdout ? stdout : stderr);
-        });
-    });
-}
