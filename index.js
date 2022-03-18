@@ -55,14 +55,9 @@ async function onAttach(drive) {
         console.log("Couldn't update.");
     }
 
-    try {
-        console.log("Starting DAQ...")
-        frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)");
-        backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)");
-    } catch (e) {
-        console.log("ERROR STARTING DAQ")
-        console.error(e.message);
-    }
+    console.log("Starting DAQ...")
+    frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)", {stdio: "inherit"});
+    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)", {stdio: "inherit"});
 
 
     console.log("Started DAQ!");
