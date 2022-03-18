@@ -2,9 +2,6 @@ const fs = require("fs");
 const drivelist = require('drivelist');
 const {spawn, execSync} = require("child_process");
 
-const nodeDir =
-
-    let
 currentMount = null;
 
 let frontendProcess = null;
@@ -30,7 +27,7 @@ async function pollUSB() {
 
 async function onAttach(drive) {
     console.log("Connected... starting DAQ!");
-    
+
     if(driveType(`${drive.device}1`) !== "ntfs")
         throw new Error("ERROR - THIS DRIVE IS NOT NTFS FORMATTED!");
 
