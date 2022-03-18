@@ -1,6 +1,6 @@
 const fs = require("fs");
 const drivelist = require('drivelist');
-const {spawn, execSync} = require("child_process");
+const {spawn, execSync, exec} = require("child_process");
 
 currentMount = null;
 
@@ -57,12 +57,15 @@ async function onAttach(drive) {
 
     console.log("Starting DAQ...")
 
-    frontendProcess = spawn("(cd ./usb/bajafrontendv1;)", {stdio: "inherit"}) // sudo -u pi npm i; sudo -u pi npm run start > frontend.log
-        .on("error", console.error);
+    frontendProcess = spawn("bash", ["run-frontend.sh"]);
+    frontendProcess.stdout.on("data", (data) => {
+        console.log(`frontend: ${data}`);
+    });
 
-    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; )", {stdio: "inherit"}) //sudo -u pi npm run dev > backend.log
-        .on("error", console.error);
-
+    backendProcess = spawn("bash", ["run-frontend.sh"]);
+    backendProcess.stdout.on("data", (data) => {
+        console.log(`backend: ${data}`);
+    });
 
     console.log("Started DAQ!");
 }
