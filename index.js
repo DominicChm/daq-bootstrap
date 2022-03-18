@@ -59,7 +59,7 @@ async function onAttach(drive) {
 
     frontendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'pipe'});
     frontendProcess.stdout.on("data", (data) => {
-        console.log(`frontend: ${data.trim()}`);
+        console.log(`frontend: ${data.toString().trim()}`);
     });
     frontendProcess.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
@@ -67,7 +67,7 @@ async function onAttach(drive) {
 
     backendProcess = spawn("bash", ["run-backend.sh"], {stdio: 'pipe'});
     backendProcess.stdout.on("data", (data) => {
-        console.log(`backend: ${data.trim()}`);
+        console.log(`backend: ${data.toString().trim()}`);
     });
     backendProcess.stderr.on('data', (data) => {
         console.error(`stderr: ${data}`);
@@ -95,7 +95,18 @@ function driveType(fsLabel) {
 
 setInterval(pollUSB, 1000);
 
-process.on('exit', function () {
+
+function killAll() {
     if (backendProcess) backendProcess.kill();
     if (frontendProcess) frontendProcess.kill();
+}
+
+process.on('exit', function () {
+    killAll();
 });
+
+process.on('uncaughtException', err => {
+    console.error('There was an uncaught error', err);
+    killAll();
+    process.exit(1) //mandatory (as per the Node.js docs)
+})
