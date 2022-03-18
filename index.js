@@ -57,7 +57,7 @@ async function onAttach(drive) {
 
     console.log("Starting DAQ...")
 
-    frontendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'inherit'});
+    frontendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'pipe'});
     frontendProcess.stdout.on("data", (data) => {
         console.log(`frontend: ${data}`);
     });
@@ -65,7 +65,7 @@ async function onAttach(drive) {
         console.error(`stderr: ${data}`);
     });
 
-    backendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'inherit'});
+    backendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'pipe'});
     backendProcess.stdout.on("data", (data) => {
         console.log(`backend: ${data}`);
     });
@@ -94,3 +94,8 @@ function driveType(fsLabel) {
 }
 
 setInterval(pollUSB, 1000);
+
+process.on('exit', function () {
+    if (backendProcess) backendProcess.kill();
+    if (frontendProcess) frontendProcess.kill();
+});
