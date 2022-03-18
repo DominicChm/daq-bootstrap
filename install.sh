@@ -16,6 +16,7 @@ then
   nvm use 17
 fi
 
+npm install
 
 #Set up the service.
 sudo systemctl disable daq-bootstrap
