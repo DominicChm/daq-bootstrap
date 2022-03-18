@@ -56,8 +56,12 @@ async function onAttach(drive) {
     }
 
     console.log("Starting DAQ...")
-    frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)", {stdio: "inherit"});
-    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)", {stdio: "inherit"});
+    
+    frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)", {stdio: "inherit"})
+        .on("error", console.error);
+
+    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)", {stdio: "inherit"})
+        .on("error", console.error);
 
 
     console.log("Started DAQ!");
