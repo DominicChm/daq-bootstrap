@@ -2,12 +2,15 @@
 Description=DAQ Bootstrapper service
 After=network.target
 StartLimitIntervalSec=0
+
 [Service]
+Environment=NODE_VERSION=17
 Type=simple
 Restart=always
 RestartSec=1
 User=pi
-ExecStart=node ~/daq-bootstrap/index.js
+WorkingDirectory=/home/pi/daq-bootstrap
+ExecStart=/home/pi/.nvm/nvm-exec node index.js
 
 [Install]
 WantedBy=multi-user.target
