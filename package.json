@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "usb": "^2.1.2"
+    "drivelist": "^9.2.4"
   }
 }

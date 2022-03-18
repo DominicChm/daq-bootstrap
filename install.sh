@@ -22,5 +22,5 @@ npm install
 sudo systemctl disable daq-bootstrap
 
 sudo cp ./daq-bootstrap.service /etc/systemd/system/
-sudo systemctl start daq-bootstrap
-sudo systemctl enable daq-bootstrap
+#sudo systemctl start daq-bootstrap
+#sudo systemctl enable daq-bootstrap
