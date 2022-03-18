@@ -55,9 +55,9 @@ async function onAttach(drive) {
         console.log("Couldn't update.");
     }
 
-    console.log("Starting DAQ...")
+    console.log("Starting DAQ processes...")
 
-    frontendProcess = spawn("bash", ["run-frontend.sh"], {stdio: 'pipe'});
+    frontendProcess = spawn("sh", ["run-frontend.sh"], {stdio: 'pipe'});
     frontendProcess.stdout.on("data", (data) => {
         console.log(`frontend: ${data.toString().trim()}`);
     });
@@ -65,7 +65,7 @@ async function onAttach(drive) {
         console.error(`stderr: ${data}`);
     });
 
-    backendProcess = spawn("bash", ["run-backend.sh"], {stdio: 'pipe'});
+    backendProcess = spawn("sh", ["run-backend.sh"], {stdio: 'pipe'});
     backendProcess.stdout.on("data", (data) => {
         console.log(`backend: ${data.toString().trim()}`);
     });
