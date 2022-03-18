@@ -10,6 +10,7 @@ let backendProcess = null;
 if (!fs.existsSync("./usb")) {
     fs.mkdirSync("./usb");
 }
+execSync(`umount ./usb`);
 
 console.log("Start monitoring...");
 
@@ -28,10 +29,11 @@ async function pollUSB() {
 async function onAttach(drive) {
     console.log("USB Connected...");
 
-    if(driveType(`${drive.device}1`) !== "ntfs")
+    if (driveType(`${drive.device}1`) !== "ntfs")
         throw new Error("ERROR - THIS DRIVE IS NOT NTFS FORMATTED!");
 
     execSync(`mount -o umask=0 ${drive.device}1 ./usb`);
+    currentMount = drive.device;
 
     if (!fs.existsSync("./usb/bajacorev1")) {
         console.log("No backend repo detected, cloning and installing...");
@@ -53,10 +55,15 @@ async function onAttach(drive) {
         console.log("Couldn't update.");
     }
 
-    console.log("Starting DAQ...")
-    currentMount = drive.device;
-    frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)");
-    backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)");
+    try {
+        console.log("Starting DAQ...")
+        frontendProcess = spawn("(cd ./usb/bajafrontendv1; sudo -u pi npm i; sudo -u pi npm run start > frontend.log)");
+        backendProcess = spawn("(cd ./usb/bajacorev1; sudo -u pi npm i; sudo -u pi npm run dev > backend.log)");
+    } catch (e) {
+        console.log("ERROR STARTING DAQ")
+        console.error(e.message);
+    }
+
 
     console.log("Started DAQ!");
 }
