@@ -1,6 +1,7 @@
 const fs = require("fs");
 const drivelist = require('drivelist');
 const {spawn, execSync, exec} = require("child_process");
+const Path = require("path");
 
 let currentMount = null;
 let daqProcess = null;
@@ -51,7 +52,13 @@ async function onAttach(drive) {
 
     console.log("Starting DAQ process...")
 
-    daqProcess = spawn("sh", ["start-daq.sh"], {stdio: 'pipe'});
+    daqProcess = spawn("sh", ["start-daq.sh"], {
+        stdio: 'pipe',
+        env: {
+            HTTP_PORT: 80,
+            DAQ_DATA_DIR: Path.resolve(__dirname, ".."),
+        }
+    });
     daqProcess.stdout.on("data", (data) => {
         console.log(data.toString().trim());
     });
