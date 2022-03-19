@@ -52,7 +52,7 @@ async function onAttach(drive) {
 
     console.log("Starting DAQ process...")
 
-    daqProcess = spawn("sh", ["start-daq.sh"], {stdio: 'pipe',});
+    daqProcess = spawn("bash", ["start-daq.sh"], {stdio: 'pipe',});
     daqProcess.stdout.on("data", (data) => {
         console.log(data.toString().trim());
     });
