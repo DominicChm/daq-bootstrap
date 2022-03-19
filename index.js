@@ -63,7 +63,7 @@ async function onAttach(drive) {
         console.log(data.toString().trim());
     });
     daqProcess.stderr.on('data', (data) => {
-        console.error(data);
+        console.error(data.toString().trim());
     });
 
     console.log("Started DAQ!");
