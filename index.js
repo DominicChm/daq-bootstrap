@@ -79,7 +79,7 @@ function driveType(fsLabel) {
     return execSync(`sudo blkid -s TYPE -o value ${fsLabel}`).toString().trim();
 }
 
-setInterval(pollUSB, 1000);
+setInterval(pollUSB, 250);
 
 
 function killAll() {
