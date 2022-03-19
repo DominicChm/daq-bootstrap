@@ -2,10 +2,8 @@ const fs = require("fs");
 const drivelist = require('drivelist');
 const {spawn, execSync, exec} = require("child_process");
 
-currentMount = null;
-
-let frontendProcess = null;
-let backendProcess = null;
+let currentMount = null;
+let daqProcess = null;
 
 if (!fs.existsSync("./usb")) {
     fs.mkdirSync("./usb");
@@ -38,42 +36,27 @@ async function onAttach(drive) {
     execSync(`mount -o big_writes,umask=0 ${drive.device}1 ./usb`);
     currentMount = drive.device;
 
-    if (!fs.existsSync("./usb/bajacorev1")) {
-        console.log("No backend repo detected, cloning and installing...");
-        execSync("(cd ./usb; git clone https://github.com/DominicChm/bajacorev1.git)", {stdio: 'inherit'});
-        execSync("(cd ./usb/bajacorev1; npm i)", {stdio: 'inherit'})
-    }
-
-    if (!fs.existsSync("./usb/bajafrontendv1")) {
-        console.log("No frontend repo detected, cloning and installing...");
-        execSync("(cd ./usb; git clone https://github.com/DominicChm/bajafrontendv1.git)", {stdio: 'inherit'});
-        execSync("(cd ./usb/bajafrontendv1; npm i)", {stdio: 'inherit'})
+    if (!fs.existsSync("./usb/daq-prebuilt")) {
+        console.log("No prebuilt repo detected, cloning and installing...");
+        execSync("(cd ./usb; git clone https://github.com/DominicChm/daq-prebuilt.git)", {stdio: 'inherit'});
+        execSync("(cd ./usb/daq-prebuilt; npm run pi-install)", {stdio: 'inherit'})
     }
 
     // Try to update the code, if we have a network connection.
     try {
-        execSync("(cd ./usb/bajafrontendv1; git pull)");
-        execSync("(cd ./usb/bajacorev1; git pull)");
+        execSync("(cd ./usb/daq-prebuilt; git pull)");
     } catch (e) {
         console.log("Couldn't update.");
     }
 
-    console.log("Starting DAQ processes...")
+    console.log("Starting DAQ process...")
 
-    frontendProcess = spawn("sh", ["run-frontend.sh"], {stdio: 'pipe'});
-    frontendProcess.stdout.on("data", (data) => {
-        console.log(`frontend: ${data.toString().trim()}`);
+    daqProcess = spawn("sh", ["start-daq.sh"], {stdio: 'pipe'});
+    daqProcess.stdout.on("data", (data) => {
+        console.log(data.toString().trim());
     });
-    frontendProcess.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    backendProcess = spawn("sh", ["run-backend.sh"], {stdio: 'pipe'});
-    backendProcess.stdout.on("data", (data) => {
-        console.log(`backend: ${data.toString().trim()}`);
-    });
-    backendProcess.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
+    daqProcess.stderr.on('data', (data) => {
+        console.error(data);
     });
 
     console.log("Started DAQ!");
@@ -82,12 +65,10 @@ async function onAttach(drive) {
 async function onDetach() {
     console.log("Detached... killing DAQ!");
 
-    frontendProcess.kill();
-    backendProcess.kill();
+    daqProcess.kill();
     execSync(`umount -l ./usb`);
     currentMount = null;
-    frontendProcess = null;
-    backendProcess = null;
+    daqProcess = null;
 
     console.log("Killed DAQ!");
 }
@@ -100,8 +81,7 @@ setInterval(pollUSB, 1000);
 
 
 function killAll() {
-    if (backendProcess) backendProcess.kill();
-    if (frontendProcess) frontendProcess.kill();
+    if (daqProcess) daqProcess.kill();
 }
 
 process.on('exit', function () {
