@@ -35,7 +35,7 @@ async function onAttach(drive) {
     if (driveType(`${drive.device}1`) !== "ntfs")
         throw new Error("ERROR - THIS DRIVE IS NOT NTFS FORMATTED!");
 
-    execSync(`mount -o umask=0 ${drive.device}1 ./usb`);
+    execSync(`mount -o big_writes,umask=0 ${drive.device}1 ./usb`);
     currentMount = drive.device;
 
     if (!fs.existsSync("./usb/bajacorev1")) {

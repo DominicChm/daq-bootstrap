@@ -1,5 +1,5 @@
-sudo apt install git -y
-sudo apt-get install libudev-dev -y # Used for usb
+sudo apt update
+sudo apt install git libudev-dev mosquitto -y
 
 # Install the n node version manager https://github.com/tj/n
 
