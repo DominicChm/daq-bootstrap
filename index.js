@@ -56,7 +56,7 @@ async function onAttach(drive) {
         stdio: 'pipe',
         env: {
             HTTP_PORT: 80,
-            DAQ_DATA_DIR: Path.resolve(__dirname, ".."),
+            DAQ_DATA_DIR: Path.resolve(__dirname, "./usb"),
         }
     });
     daqProcess.stdout.on("data", (data) => {
