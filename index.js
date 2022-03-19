@@ -93,7 +93,7 @@ async function onDetach() {
 }
 
 function driveType(fsLabel) {
-    return execSync(`sudo blkid -s TYPE -o value /dev/sdc1`).toString().trim();
+    return execSync(`sudo blkid -s TYPE -o value ${fsLabel}`).toString().trim();
 }
 
 setInterval(pollUSB, 1000);
