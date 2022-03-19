@@ -1,4 +1,4 @@
-cd ./usb/daq-prebuilt || exit;
+cd ./usb/daq-prebuilt/ || exit;
 
 echo "Starting..."
-npm run start
+sudo n exec 17 npm run start
