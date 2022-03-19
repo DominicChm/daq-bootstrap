@@ -45,6 +45,7 @@ async function onAttach(drive) {
 
     // Try to update the code, if we have a network connection.
     try {
+        execSync("(cd ./usb/daq-prebuilt; git reset --hard)");
         execSync("(cd ./usb/daq-prebuilt; git pull)");
     } catch (e) {
         console.log("Couldn't update.");
