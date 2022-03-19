@@ -10,8 +10,11 @@ let backendProcess = null;
 if (!fs.existsSync("./usb")) {
     fs.mkdirSync("./usb");
 }
-execSync(`umount ./usb`);
-
+try {
+    execSync(`umount ./usb`);
+} catch (e) {
+    console.log("No need to unmount...");
+}
 console.log("Start monitoring...");
 
 async function pollUSB() {
